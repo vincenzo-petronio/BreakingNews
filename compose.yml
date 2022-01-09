@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+    db_news_write:
+        build:
+            context: ./infrastructure/db_news_write
+        container_name: cnt_db_news_write
+        image: img_db_news_write
+        environment:
+            - ACCEPT_EULA=Y
+        ports:
+            - "3005:5432"
