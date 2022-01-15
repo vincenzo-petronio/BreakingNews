@@ -24,7 +24,7 @@ namespace be_write.Controllers
         [HttpGet]
         public async Task<List<News>> Get()
         {
-            List<News> result = new List<News>();
+            List<News> result = new();
 
             await using var connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
 
@@ -59,8 +59,11 @@ namespace be_write.Controllers
 
         // POST api/<NewsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task Post([FromBody] News value)
         {
+            string command = $"SET datestyle = \"ISO, DMY\"; INSERT INTO \"News\" (\"Title\", \"Description\", \"Timestamp\", \"Author\") VALUES ('{value.Title}', '{value.Description}', '{value.Timestamp}', '{value.Author}')";
+            await using var connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
+            await connection.ExecuteAsync(command);
         }
 
         // PUT api/<NewsController>/5
