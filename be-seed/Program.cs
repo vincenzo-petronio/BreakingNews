@@ -14,7 +14,9 @@ var host = Host.CreateDefaultBuilder(args)
 var httpClientFactory = host.Services.GetRequiredService<IHttpClientFactory>();
 var httpClient = httpClientFactory.CreateClient();
 
-List<News> news = new();
+// DEBUG
+//var pastNewsResponse = await httpClient.GetAsync("http://localhost:5000/api/News");
+//var pastNews = await pastNewsResponse.Content.ReadFromJsonAsync<List<News>>();
 
 var randomNewsPattern = new Faker<News>()
     .RuleFor(n => n.Title, f => f.Lorem.Word())
@@ -32,15 +34,12 @@ var randomNewsPattern = new Faker<News>()
     })
     ;
 
-var randomNews = randomNewsPattern.GenerateBetween(1, 5);
+var randomNews = randomNewsPattern.GenerateBetween(10, 55);
 
 foreach (var n in randomNews)
 {
-    var nJson = System.Text.Json.JsonSerializer.Serialize<News>(n);
-    var response = await httpClient.PostAsJsonAsync("http://localhost:5000/api/News", nJson);
+    var response = await httpClient.PostAsJsonAsync("http://localhost:5000/api/News", n);
     Console.WriteLine(response.StatusCode);
 }
 
 await host.RunAsync();
-
-Console.WriteLine("END");
