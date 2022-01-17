@@ -9,3 +9,25 @@ services:
             - ACCEPT_EULA=Y
         ports:
             - "3005:5432"
+    
+    db_news_read:
+        build:
+            context: ./infrastructure/db_news_read
+        container_name: cnt_db_news_read
+        image: img_db_news_read
+        restart: always
+        ports:
+            - "3006:27017"
+
+    mongodb_gui:
+        image: mongo-express
+        restart: always
+        ports:
+            - 8081:8081 # mongodb gui
+        environment:
+            # - ME_CONFIG_MONGODB_URL="mongodb://admin:admin@localhost:3006/db?ssl=false"
+            - ME_CONFIG_MONGODB_SERVER=db_news_read
+            - ME_CONFIG_MONGODB_AUTH_USERNAME=admin
+            - ME_CONFIG_MONGODB_AUTH_PASSWORD=admin
+        depends_on:
+            - db_news_read
