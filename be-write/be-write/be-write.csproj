@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.5.1" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
     <PackageReference Include="Npgsql" Version="6.0.2" />

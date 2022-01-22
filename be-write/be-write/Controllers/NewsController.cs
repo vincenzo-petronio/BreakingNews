@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Azure.Messaging.ServiceBus;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 
@@ -10,13 +11,18 @@ namespace be_write.Controllers
     [ApiController]
     public class NewsController : ControllerBase
     {
+        private const string ServiceBusTopic = "BreakingNews";
         private readonly ILogger<NewsController> logger;
         private readonly IConfiguration configuration;
+        private ServiceBusClient serviceBusClient;
+        private ServiceBusSender serviceBusSender;
 
         public NewsController(ILogger<NewsController> logger, IConfiguration configuration)
         {
             this.logger = logger;
             this.configuration = configuration;
+            serviceBusClient = new ServiceBusClient(configuration.GetConnectionString("AzureServiceBus"));
+            serviceBusSender = serviceBusClient.CreateSender(ServiceBusTopic);
         }
 
 
@@ -61,9 +67,34 @@ namespace be_write.Controllers
         [HttpPost]
         public async Task Post(News value)
         {
-            string command = $"SET datestyle = \"ISO, DMY\"; INSERT INTO \"News\" (\"Title\", \"Description\", \"Timestamp\", \"Author\") VALUES ('{value.Title}', '{value.Description}', '{value.Timestamp}', '{value.Author}')";
+            string command = $"SET datestyle = \"ISO, DMY\"; INSERT INTO \"News\" (\"Title\", \"Description\", \"Timestamp\", \"Author\") VALUES ('{value.Title}', '{value.Description}', '{value.Timestamp}', '{value.Author}') RETURNING \"Id\";";
             await using var connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
-            await connection.ExecuteAsync(command);
+            ulong id = await connection.QueryFirstAsync<ulong>(command);
+
+            if (id > 0)
+            {
+                ShortNews news = new()
+                {
+                    Id = id,
+                    Title = value.Title,
+                    Timestamp = value.Timestamp
+                };
+                var newsJson = System.Text.Json.JsonSerializer.Serialize<ShortNews>(news);
+                ServiceBusMessage eventMessage = new ServiceBusMessage(newsJson);
+                try
+                {
+                    await serviceBusSender.SendMessageAsync(eventMessage);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    await serviceBusSender.DisposeAsync();
+                    await serviceBusClient.DisposeAsync();
+                }
+            }
         }
 
         // PUT api/<NewsController>/5
