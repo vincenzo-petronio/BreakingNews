@@ -73,14 +73,14 @@ namespace be_write.Controllers
 
             if (id > 0)
             {
-                ShortNews news = new()
+                NewsEvent newsEvent = new()
                 {
-                    Id = id,
+                    IdSql = id,
                     Title = value.Title,
                     Timestamp = value.Timestamp
                 };
-                var newsJson = System.Text.Json.JsonSerializer.Serialize<ShortNews>(news);
-                ServiceBusMessage eventMessage = new ServiceBusMessage(newsJson);
+                var newsEventJson = System.Text.Json.JsonSerializer.Serialize<NewsEvent>(newsEvent);
+                ServiceBusMessage eventMessage = new ServiceBusMessage(newsEventJson);
                 try
                 {
                     await serviceBusSender.SendMessageAsync(eventMessage);

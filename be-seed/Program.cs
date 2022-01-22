@@ -34,7 +34,7 @@ var randomNewsPattern = new Faker<News>()
     })
     ;
 
-var randomNews = randomNewsPattern.GenerateBetween(1, 1);
+var randomNews = randomNewsPattern.GenerateBetween(3, 10);
 
 foreach (var n in randomNews)
 {

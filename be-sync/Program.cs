@@ -1,13 +1,25 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Azure.Messaging.ServiceBus;
+using be_sync;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 
 Console.WriteLine("Hello, World!");
 
 
+//using IHost host = Host.CreateDefaultBuilder(args).Build();
 
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
 
-ServiceBusClient serviceBusClient = new ServiceBusClient("");
+ServiceBusClient serviceBusClient = new ServiceBusClient(configuration.GetConnectionString("AzureServiceBus"));
 ServiceBusProcessor serviceBusProcessor = serviceBusClient.CreateProcessor("BreakingNews", "breakingnews-sub-001", new ServiceBusProcessorOptions());
+
+IMongoClient mongoClient = new MongoClient(configuration["MongoDb:ConnectionString"]);
+IMongoDatabase mongoDb = mongoClient.GetDatabase(configuration["MongoDb:DatabaseName"]);
+IMongoCollection<News> mongoCollection = mongoDb.GetCollection<News>(configuration["MongoDb:CollectionName"]);
 
 try
 {
@@ -27,10 +39,22 @@ finally
 
 async Task MessageHandler(ProcessMessageEventArgs args)
 {
-    string body = args.Message.Body.ToString();
-    Console.WriteLine($"RECEIVED: {body}");
+    string newsJson = args.Message.Body.ToString();
+    Console.WriteLine($"RECEIVED: {newsJson}");
 
-    await args.CompleteMessageAsync(args.Message);
+    try
+    {
+        var newsDocument = BsonSerializer.Deserialize<News>(newsJson);
+
+        await mongoCollection.InsertOneAsync(newsDocument);
+
+        await args.CompleteMessageAsync(args.Message);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"EXCEPTION: {ex.Message}");
+    }
+
 }
 
 Task ErrorHandler(ProcessErrorEventArgs arg)
@@ -38,3 +62,5 @@ Task ErrorHandler(ProcessErrorEventArgs arg)
     Console.WriteLine($"EXCEPTION: {arg.Exception.Message}");
     return Task.CompletedTask;
 }
+
+//await host.RunAsync();
