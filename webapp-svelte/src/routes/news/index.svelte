@@ -1,5 +1,7 @@
 <script>
 	import NewsList from './newsList.svelte';
+
+	let newsCount = 10;
 </script>
 
 <svelte:head>
@@ -9,7 +11,10 @@
 
 <h1>Breaking News</h1>
 
-<NewsList />
+<label for="id_numnews">Number of news</label>
+<input id="id_numnews" bind:value={newsCount} />
+
+<NewsList news_count={newsCount} />
 
 <style>
 	h1 {

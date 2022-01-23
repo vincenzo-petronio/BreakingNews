@@ -1,21 +1,27 @@
 <script>
-	let listOfNews = [
-		{ title: 'aaa', timestamp: '2022-01-01' },
-		{ title: 'bbb', timestamp: '2022-01-02' },
-		{ title: 'ccc', timestamp: '2022-01-03' },
-		{ title: 'ddd', timestamp: '2022-01-04' }
-	];
+	import { onMount } from 'svelte';
 
-    let counter = 1;
+	export let news_count;
+
+	let listOfNews = [];
+
+	let counter = 1;
+
+	onMount(async () => {
+		const response = await fetch('http://localhost:5002/api/News');
+		const data = await response.json();
+		console.log(data);
+		listOfNews = data;
+	});
 
 	function OnRefreshButtonClicked() {
-        // listOfNews.push({title: 'refresh ' + counter, timestamp: new Date()});
-        // listOfNews.push({title: 'eee', timestamp: '2022-01-05'});
-        counter++;
-    }
+		// listOfNews.push({ title: 'eee', timestamp: '2022-01-05' });
+		// listOfNews = listOfNews;
+		counter++;
+	}
 </script>
 
-<h2>List of news</h2>
+<h2>List of last {news_count} news</h2>
 <ul>
 	{#each listOfNews as { title, timestamp }}
 		<li>
@@ -25,4 +31,4 @@
 </ul>
 
 <button on:click={OnRefreshButtonClicked}>Refresh</button>
-<input bind:value="{counter}">
+<input bind:value={counter} />
