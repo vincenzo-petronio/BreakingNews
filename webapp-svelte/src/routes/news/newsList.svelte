@@ -1,10 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 
-	export let news_count;
+	// export let news_count = 10;
 
 	let listOfNews = [];
-
 	let counter = 1;
 
 	onMount(async () => {
@@ -12,6 +11,7 @@
 		const data = await response.json();
 		console.log(data);
 		listOfNews = data;
+		// listOfNews.slice()
 	});
 
 	function OnRefreshButtonClicked() {
@@ -21,7 +21,7 @@
 	}
 </script>
 
-<h2>List of last {news_count} news</h2>
+<h4>List of last news</h4>
 <ul>
 	{#each listOfNews as { title, timestamp }}
 		<li>
@@ -30,5 +30,5 @@
 	{/each}
 </ul>
 
-<button on:click={OnRefreshButtonClicked}>Refresh</button>
-<input bind:value={counter} />
+<button class="btn btn-primary" on:click={OnRefreshButtonClicked}>Refresh</button>
+<!-- <input bind:value={counter} /> -->
