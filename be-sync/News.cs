@@ -5,6 +5,8 @@ namespace be_sync
 {
     internal class News
     {
+        public ObjectId Id { get; set; }
+
         public ulong IdSql { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

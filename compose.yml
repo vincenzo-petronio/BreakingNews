@@ -23,7 +23,7 @@ services:
         image: mongo-express
         restart: always
         ports:
-            - 8081:8081 # mongodb gui
+            - 3007:8081 # mongodb gui
         environment:
             # - ME_CONFIG_MONGODB_URL="mongodb://admin:admin@localhost:3006/db?ssl=false"
             - ME_CONFIG_MONGODB_SERVER=db_news_read
@@ -31,3 +31,31 @@ services:
             - ME_CONFIG_MONGODB_AUTH_PASSWORD=admin
         depends_on:
             - db_news_read
+    
+    news_write:
+        build:
+            context: ./be-write/be-write
+        container_name: cnt_news_write
+        image: img_news_write
+        ports:
+            - "5000:80"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+
+    news_read:
+        build:
+            context: ./be-read
+        container_name: cnt_news_read
+        image: img_news_read
+        ports:
+            - "5002:80"
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+
+    news_sync:
+        build:
+            context: ./be-sync
+        container_name: cnt_news_sync
+        image: img_news_sync
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development

@@ -8,13 +8,22 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    //options.AddDefaultPolicy(builder =>
+    //{
+    //    builder.WithOrigins(new[] { "http://localhost", "https://localhost", "http://localhost:3000" })
+    //        .AllowAnyHeader()
+    //        .AllowAnyMethod()
+    //        ;
+    //});
+
+    options.AddPolicy("RelaxPolicy", builder =>
     {
-        builder.WithOrigins(new[] { "http://localhost", "https://localhost" })
-            //.AllowAnyHeader()
-            //.AllowAnyMethod()
-            ;
-    });
+        builder.AllowAnyOrigin()
+        //WithOrigins(new[] { "http://localhost", "https://localhost", "http://localhost:3000" })
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    })
+    ;
 });
 
 var app = builder.Build();
@@ -28,7 +37,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("RelaxPolicy");
 
 app.UseAuthorization();
 

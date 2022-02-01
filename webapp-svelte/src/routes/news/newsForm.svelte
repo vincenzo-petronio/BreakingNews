@@ -7,30 +7,26 @@
 	};
 
 	function OnSubmitButtonClicked(event) {
-		// const formData = new FormData(event.target);
-		// const data = {};
-
-		// for (let field in formData) {
-		// 	const [key, value] = field;
-
-		// 	// if (key === 'author' && !isNameValid(value)) {
-		// 	// 	errors[key] = key + ' can only have alphabets!';
-		// 	// 	continue;
-		// 	// }
-
-		// 	// if (!value) {
-		// 	// 	errors[key] = key + ' is required';
-		// 	// }
-
-		// 	data[key] = value;
-		// }
-
 		console.log(formModel);
-		// alert('Are you sure?');
+
+		SendNewsAsync();
 	}
 
 	function isNameValid(value) {
 		return /^[a-zA-Z]$/.test(value);
+	}
+
+	async function SendNewsAsync(){
+		const response = await fetch('http://localhost:5002/api/News', {
+			method: 'POST',
+			headers: {
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+			body: JSON.stringify(formModel)
+		});
+		const data = await response.json();
+		console.log(data);
 	}
 </script>
 

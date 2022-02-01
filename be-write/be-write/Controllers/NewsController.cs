@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.Text.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -67,9 +68,13 @@ namespace be_write.Controllers
         [HttpPost]
         public async Task Post(News value)
         {
-            string command = $"SET datestyle = \"ISO, DMY\"; INSERT INTO \"News\" (\"Title\", \"Description\", \"Timestamp\", \"Author\") VALUES ('{value.Title}', '{value.Description}', '{value.Timestamp}', '{value.Author}') RETURNING \"Id\";";
+            Console.WriteLine($"NEWS RECEIVED: {JsonSerializer.Serialize(value)}");
+
+            string command = $"SET datestyle = \"ISO, DMY\"; INSERT INTO \"News\" (\"Title\", \"Description\", \"Timestamp\", \"Author\") VALUES ('{value.Title}', '{value.Description}', '{value.Timestamp.ToString("dd/MM/yyyy")}', '{value.Author}') RETURNING \"Id\";";
             await using var connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
             ulong id = await connection.QueryFirstAsync<ulong>(command);
+
+            Console.WriteLine($"NEWS SAVED WITH ID: {id}");
 
             if (id > 0)
             {
@@ -83,11 +88,12 @@ namespace be_write.Controllers
                 ServiceBusMessage eventMessage = new ServiceBusMessage(newsEventJson);
                 try
                 {
+                    Console.WriteLine($"TRY TO SEND EVENT ID: {newsEvent.IdSql}");
                     await serviceBusSender.SendMessageAsync(eventMessage);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine($"EXCEPTION: {ex.Message}");
                 }
                 finally
                 {
@@ -105,8 +111,11 @@ namespace be_write.Controllers
 
         // DELETE api/<NewsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
+            string command = $"DELETE \"News\" WHERE Id = '{id}'";
+            await using var connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
+            await connection.ExecuteAsync(command);
         }
     }
 }

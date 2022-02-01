@@ -2,13 +2,14 @@
 using Azure.Messaging.ServiceBus;
 using be_sync;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 Console.WriteLine("Hello, World!");
 
 
-//using IHost host = Host.CreateDefaultBuilder(args).Build();
+var host = Host.CreateDefaultBuilder(args).Build();
 
 IConfiguration configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
@@ -27,8 +28,9 @@ try
     serviceBusProcessor.ProcessErrorAsync += ErrorHandler;
     await serviceBusProcessor.StartProcessingAsync();
 
-    Console.WriteLine("Press any key to end the processing");
-    Console.ReadKey();
+    await host.RunAsync();
+    //Console.WriteLine("Press any key to end the processing");
+    //Console.ReadKey();
     await serviceBusProcessor.StopProcessingAsync();
 }
 finally
@@ -40,7 +42,7 @@ finally
 async Task MessageHandler(ProcessMessageEventArgs args)
 {
     string newsJson = args.Message.Body.ToString();
-    Console.WriteLine($"RECEIVED: {newsJson}");
+    Console.WriteLine($"EVENT RECEIVED: {newsJson}");
 
     try
     {
@@ -49,6 +51,8 @@ async Task MessageHandler(ProcessMessageEventArgs args)
         await mongoCollection.InsertOneAsync(newsDocument);
 
         await args.CompleteMessageAsync(args.Message);
+
+        Console.WriteLine($"EVENT SAVED WITH ID: {newsDocument.Id}");
     }
     catch (Exception ex)
     {
@@ -62,5 +66,3 @@ Task ErrorHandler(ProcessErrorEventArgs arg)
     Console.WriteLine($"EXCEPTION: {arg.Exception.Message}");
     return Task.CompletedTask;
 }
-
-//await host.RunAsync();

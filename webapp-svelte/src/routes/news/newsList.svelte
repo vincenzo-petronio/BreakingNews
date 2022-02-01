@@ -7,17 +7,19 @@
 	let counter = 1;
 
 	onMount(async () => {
+		listOfNews = await GetListOfNewsAsync();
+	});
+
+	async function OnRefreshButtonClicked() {
+		listOfNews = await GetListOfNewsAsync();
+		counter++;
+	}
+
+	async function GetListOfNewsAsync() {
 		const response = await fetch('http://localhost:5002/api/News');
 		const data = await response.json();
 		console.log(data);
-		listOfNews = data;
-		// listOfNews.slice()
-	});
-
-	function OnRefreshButtonClicked() {
-		// listOfNews.push({ title: 'eee', timestamp: '2022-01-05' });
-		// listOfNews = listOfNews;
-		counter++;
+		return data;
 	}
 </script>
 

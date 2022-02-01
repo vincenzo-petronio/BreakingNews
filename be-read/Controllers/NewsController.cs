@@ -55,9 +55,10 @@ namespace be_read.Controllers
 
         // DELETE api/<NewsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<bool> Delete(long id)
         {
-            throw new NotImplementedException();
+            var response = await mongoCollection.DeleteOneAsync(n => n.IdSql == (ulong)id);
+            return response.DeletedCount == 1;
         }
     }
 }
