@@ -4,7 +4,16 @@
 	// export let news_count = 10;
 
 	let listOfNews = [];
+
 	let counter = 1;
+
+	// reactive statement: viene eseguito quando cambia la proprietà interna al blocco.
+	$: {
+		console.log(counter);
+		if (counter > 5) {
+			alert('stop it!');
+		}
+	}
 
 	onMount(async () => {
 		listOfNews = await GetListOfNewsAsync();
@@ -28,7 +37,12 @@
 	{#each listOfNews as { title, timestamp }}
 		<li>
 			{title} [{timestamp}]
+			{#if new Date(timestamp).getFullYear() < new Date().getFullYear()}
+				<strong style="color: gray;">TOO OLD!</strong>
+			{/if}
 		</li>
+	{:else}
+		<p>no news!</p>
 	{/each}
 </ul>
 
