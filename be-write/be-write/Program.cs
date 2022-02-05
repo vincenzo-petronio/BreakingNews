@@ -18,10 +18,11 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("RelaxPolicy", builder =>
     {
-        builder.AllowAnyOrigin()
-        //WithOrigins(new[] { "http://localhost", "https://localhost", "http://localhost:3000" })
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        builder
+            // .WithOrigins(new[] { "http://localhost", "https://localhost", "http://localhost:3000" })
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     })
     ;
 });

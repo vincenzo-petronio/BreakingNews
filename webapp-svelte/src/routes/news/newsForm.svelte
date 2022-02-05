@@ -3,10 +3,12 @@
 	let formModel = {
 		title: '',
 		description: '',
-		author: ''
+		author: '',
+		timestamp: null
 	};
 
 	function OnSubmitButtonClicked(event) {
+		formModel.timestamp = new Date().toJSON();
 		console.log(formModel);
 
 		SendNewsAsync();
@@ -16,17 +18,19 @@
 		return /^[a-zA-Z]$/.test(value);
 	}
 
-	async function SendNewsAsync(){
-		const response = await fetch('http://localhost:5002/api/News', {
+	async function SendNewsAsync() {
+		const response = await fetch('http://localhost:5000/api/News', {
 			method: 'POST',
 			headers: {
-                'Accept': 'application/json, text/plain',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
+				Accept: 'application/json, text/plain',
+				'Content-Type': 'application/json;charset=UTF-8'
+				// 'Access-Control-Allow-Origin': '*'
+				// 	'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
+				// 	'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
+			},
 			body: JSON.stringify(formModel)
 		});
-		const data = await response.json();
-		console.log(data);
+		console.log(response.status + ':' + response.statusText);
 	}
 </script>
 
