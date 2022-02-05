@@ -14,6 +14,10 @@ npm run dev -- --open
 
 ## Back End
 
+```bash
+docker compose up --build
+```
+
 [Command](http://localhost:5000/api/News)
   
 [Query](http://localhost:5002/api/News)
