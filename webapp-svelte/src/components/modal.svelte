@@ -1,5 +1,5 @@
 <script>
-	let isReadOnly = true;
+	let isReadOnly = false;
 
 	export let model = {}; // default value è oggetto vuoto, ma può essere inizializzata dal chiamante
 </script>
@@ -21,10 +21,26 @@
 				<label for="id_tel">Telephone</label>
 				<input id="id_tel" type="number" readonly={isReadOnly} value={model.telephone} /><br />
 				<label for="id_sub">Subscription Date</label>
-				<input id="id_sub" type="datetime" readonly={isReadOnly} value={model.subscriptionDate} /><br />
+				<input
+					id="id_sub"
+					type="datetime"
+					readonly={isReadOnly}
+					value={model.subscriptionDate}
+				/><br />
+				<slot name="moreData"></slot>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button id="id_btnClose" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+					>Close</button
+				>
+				<!-- L' event click viene catturato dal chiamante, grazie al forwarding degli eventi -->
+				<button
+					id="id_btnSave"
+					type="button"
+					class="btn btn-primary"
+					data-bs-dismiss="modal"
+					on:click>Save</button
+				>
 			</div>
 		</div>
 	</div>
