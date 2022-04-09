@@ -1,6 +1,5 @@
 <script>
-	import Header from '../components/header.svelte';
-	import Modal from '../components/modal.svelte';
+	import Modal from '$lib/modal.svelte';
 
 	let dataModel = {
 		name: 'vincenzo',
@@ -20,7 +19,7 @@
 	};
 </script>
 
-<Header />
+<h2>Modal</h2>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#id_modal">
 	Demo modal
 </button>
